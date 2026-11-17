@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+<meta name="theme-color" content="#211923">
+
+<title>Self-development</title>
+
+<style>
+
+:root {
+
+  --bg:#211923;
+
+  --panel:#302431;
+
+  --panel2:#3b2b38;
+
+  --pink:#e9a9c7;
+
+  --pink2:#c77fa4;
+
+  --text:#fff0f6;
+
+  --muted:#bda9b7;
+
+  --line:#493746;
+
+  --green:#9bc7a8;
+
+}
+
+*{box-sizing:border-box}
+
+body{
+
+  margin:0;background:var(--bg);color:var(--text);
+
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+  padding:env(safe-area-inset-top) 0 calc(90px + env(safe-area-inset-bottom));
+
+}
+
+button,input,textarea{font:inherit}
+
+button{cursor:pointer}
+
+header{padding:25px 20px 15px}
+
+.brand{font-size:12px;letter-spacing:3px;color:var(--pink)}
+
+h1{font-size:28px;margin:12px 0 5px}
+
+.sub{color:var(--muted);font-size:14px}
+
+main{padding:0 16px;max-width:650px;margin:auto}
+
+.page{display:none}
+
+.page.active{display:block}
+
+.card{
+
+ background:var(--panel);border:1px solid var(--line);
+
+ border-radius:20px;padding:17px;margin-bottom:14px;
+
+}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+.small{font-size:12px;color:var(--muted)}
+
+.progress{height:8px;background:#493746;border-radius:20px;overflow:hidden;margin:13px 0}
+
+.progress span{display:block;height:100%;background:var(--pink);border-radius:20px;transition:.3s}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+
+.stat{background:var(--panel2);border-radius:14px;padding:12px 8px;text-align:center}
+
+.stat strong{font-size:23px;display:block;color:var(--pink)}
+
+.stat small{font-size:11px;color:var(--muted)}
+
+h2{font-size:18px;margin:22px 3px 12px}
+
+.habit{
+
+ display:flex;align-items:center;gap:12px;
+
+ padding:13px;background:var(--panel);border:1px solid var(--line);
+
+ border-radius:15px;margin-bottom:9px;
+
+}
+
+.habit.done{opacity:.65}
+
+.habit.done .habit-name{text-decoration:line-through}
+
+.check{
+
+ width:27px;height:27px;border:1.5px solid var(--pink2);
+
+ border-radius:9px;background:transparent;color:var(--bg);
+
+ flex-shrink:0;font-weight:bold;
+
+}
+
+.done .check{background:var(--pink);border-color:var(--pink)}
+
+.habit-name{flex:1;font-size:14px}
+
+.habit-meta{font-size:11px;color:var(--muted);margin-top:4px}
+
+.btn{
+
+ border:0;background:var(--pink);color:#291b25;
+
+ border-radius:12px;padding:12px 16px;font-weight:650;
+
+}
+
+.btn.secondary{background:var(--panel2);color:var(--pink)}
+
+.btn.full{width:100%;margin-top:10px}
+
+input,textarea{
+
+ width:100%;background:var(--panel2);border:1px solid var(--line);
+
+ color:var(--text);border-radius:12px;padding:13px;outline:none;
+
+ margin:7px 0;
+
+}
+
+textarea{min-height:130px;resize:vertical}
+
+input::placeholder,textarea::placeholder{color:#a994a3}
+
+.tabs{
+
+ position:fixed;bottom:0;left:0;right:0;z-index:5;
+
+ background:#2a202b;border-top:1px solid var(--line);
+
+ display:flex;justify-content:space-around;
+
+ padding:10px 3px calc(10px + env(safe-area-inset-bottom));
+
+}
+
+.tabs button{
+
+ border:0;background:none;color:var(--muted);
+
+ font-size:10px;display:flex;flex-direction:column;
+
+ align-items:center;gap:5px;min-width:18%;
+
+}
+
+.tabs button span{font-size:20px}
+
+.tabs button.active{color:var(--pink)}
+
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center}
+
+.day{padding:9px 0;border-radius:9px;background:var(--panel2);font-size:12px}
+
+.day.today{outline:1px solid var(--pink)}
+
+.day.marked{background:var(--pink);color:#291b25}
+
+.day.empty{background:transparent}
+
+.list-item{padding:13px 0;border-bottom:1px solid var(--line)}
+
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;background:#513b4c;color:var(--pink);font-size:11px}
+
+.empty{text-align:center;color:var(--muted);padding:25px 5px}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+ <div class="brand">SELF-DEVELOPMENT ✦</div>
+
+ <h1 id="greeting">Твой новый день</h1>
+
+ <div class="sub" id="todayDate"></div>
+
+</header>
+
+<main>
+
+<section class="page active" id="today">
+
+ <div class="card">
+
+  <div class="row"><b>Прогресс дня</b><span id="percent">0%</span></div>
+
+  <div class="progress"><span id="progressBar" style="width:0%"></span></div>
+
+  <div class="stats">
+
+   <div class="stat"><strong id="completed">0</strong><small>Выполнено</small></div>
+
+   <div class="stat"><strong id="total">0</strong><small>Привычек</small></div>
+
+   <div class="stat"><strong id="xp">0</strong><small>XP</small></div>
+
+  </div>
+
+ </div>
+
+ <div class="row">
+
+  <h2>Мои привычки</h2>
+
+  <button class="btn secondary" onclick="addHabit()">＋ Добавить</button>
+
+ </div>
+
+ <div id="habits"></div>
+
+ <div class="card">
+
+  <div class="row"><b>Твой уровень</b><span class="badge" id="level">Уровень 1</span></div>
+
+  <div class="progress"><span id="levelBar" style="width:0%"></span></div>
+
+  <div class="small" id="levelText">0 / 100 XP до следующего уровня</div>
+
+ </div>
+
+</section>
+
+<section class="page" id="calendar">
+
+ <h2>Календарь</h2>
+
+ <div class="card">
+
+  <div class="row">
+
+   <button class="btn secondary" onclick="changeMonth(-1)">‹</button>
+
+   <b id="monthTitle"></b>
+
+   <button class="btn secondary" onclick="changeMonth(1)">›</button>
+
+  </div>
+
+  <div class="calendar" id="calendarGrid" style="margin-top:18px"></div>
+
+  <p class="small">Розовый цвет — в этот день была выполнена хотя бы одна привычка.</p>
+
+ </div>
+
+</section>
+
+<section class="page" id="stats">
+
+ <h2>Моя статистика</h2>
+
+ <div class="card">
+
+  <div class="stats">
+
+   <div class="stat"><strong id="statDays">0</strong><small>Активных дней</small></div>
+
+   <div class="stat"><strong id="statDone">0</strong><small>Выполнений</small></div>
+
+   <div class="stat"><strong id="statRate">0%</strong><small>Успешность</small></div>
+
+  </div>
+
+ </div>
+
+ <div class="card">
+
+  <b>Текущие серии</b>
+
+  <div id="streakList"></div>
+
+ </div>
+
+ <div class="card">
+
+  <b>Достижения</b>
+
+  <div id="achievements"></div>
+
+ </div>
+
+</section>
+
+<section class="page" id="goals">
+
+ <h2>Мои цели</h2>
+
+ <div class="card">
+
+  <b>Новая цель</b>
+
+  <input id="goalInput" placeholder="Например: прочитать 12 книг">
+
+  <button class="btn full" onclick="addGoal()">Добавить цель</button>
+
+ </div>
+
+ <div id="goalList"></div>
+
+</section>
+
+<section class="page" id="journal">
+
+ <h2>Мой дневник</h2>
+
+ <div class="card">
+
+  <b>Как прошёл твой день?</b>
+
+  <div class="small" id="journalDate"></div>
+
+  <textarea id="journalText" placeholder="Запиши свои мысли, идеи и маленькие победы..."></textarea>
+
+  <button class="btn full" onclick="saveJournal()">Сохранить запись</button>
+
+  <div class="small" id="savedMessage"></div>
+
+ </div>
+
+ <h2>Напоминания</h2>
+
+ <div class="card">
+
+  <b>Время напоминания</b>
+
+  <input type="time" id="reminderTime">
+
+  <button class="btn full" onclick="setReminder()">Включить напоминание</button>
+
+  <p class="small" id="reminderStatus">Напоминания пока выключены.</p>
+
+ </div>
+
+</section>
+
+</main>
+
+<nav class="tabs">
+
+ <button class="active" onclick="showPage('today',this)"><span>⌂</span>Главная</button>
+
+ <button onclick="showPage('calendar',this)"><span>▦</span>Календарь</button>
+
+ <button onclick="showPage('stats',this)"><span>▥</span>Статистика</button>
+
+ <button onclick="showPage('goals',this)"><span>☆</span>Цели</button>
+
+ <button onclick="showPage('journal',this)"><span>♡</span>Дневник</button>
+
+</nav>
+
+<script>
+
+const KEY='selfDevelopmentData';
+
+const dateKey=()=>new Date().toLocaleDateString('en-CA');
+
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
+
+ habits:[
+
+  {id:1,name:'Выпить 2 литра воды'},
+
+  {id:2,name:'Прочитать 20 страниц'},
+
+  {id:3,name:'Утренняя зарядка'},
+
+  {id:4,name:'Изучать английский'},
+
+  {id:5,name:'Уход за собой'}
+
+ ],
+
+ logs:{},goals:[],journal:{},reminder:''
+
+};
+
+let viewDate=new Date();
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+
+function todayLog(){return data.logs[dateKey()]||[]}
+
+function done(id){return todayLog().includes(id)}
+
+function toggle(id){
+
+ let a=todayLog();
+
+ data.logs[dateKey()]=a.includes(id)?a.filter(x=>x!==id):[...a,id];
+
+ save();render();
+
+}
+
+function addHabit(){
+
+ let name=prompt('Название новой привычки:');
+
+ if(!name||!name.trim())return;
+
+ data.habits.push({id:Date.now(),name:name.trim()});
+
+ save();render();
+
+}
+
+function showPage(id,button){
+
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+
+ document.getElementById(id).classList.add('active');
+
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+
+ button.classList.add('active');
+
+ render();
+
+}
+
+function streak(id){
+
+ let n=0,d=new Date();
+
+ while(true){
+
+  let k=d.toLocaleDateString('en-CA');
+
+  if((data.logs[k]||[]).includes(id)){n++;d.setDate(d.getDate()-1)}
+
+  else break;
+
+ }
+
+ return n;
+
+}
+
+function totalXP(){
+
+ return Object.values(data.logs).reduce((s,a)=>s+a.length*10,0);
+
+}
+
+function render(){
+
+ let doneCount=todayLog().length,total=data.habits.length;
+
+ let pct=total?Math.round(doneCount/total*100):0;
+
+ document.getElementById('completed').textContent=doneCount;
+
+ document.getElementById('total').textContent=total;
+
+ document.getElementById('percent').textContent=pct+'%';
+
+ document.getElementById('progressBar').style.width=pct+'%';
+
+ let xp=totalXP(),level=Math.floor(xp/100)+1;
+
+ document.getElementById('xp').textContent=xp;
+
+ document.getElementById('level').textContent='Уровень '+level;
+
+ document.getElementById('levelBar').style.width=(xp%100)+'%';
+
+ document.getElementById('levelText').textContent=(xp%100)+' / 100 XP до следующего уровня';
+
+ document.getElementById('habits').innerHTML=data.habits.map(h=>`
+
+ <div class="habit ${done(h.id)?'done':''}">
+
+ <button class="check" onclick="toggle(${h.id})">${done(h.id)?'✓':''}</button>
+
+ <div class="habit-name">${escapeHTML(h.name)}<div class="habit-meta">🔥 ${streak(h.id)} дней подряд</div></div>
+
+ <button class="btn secondary" onclick="removeHabit(${h.id})">×</button>
+
+ </div>`).join('')||'<div class="empty">Добавь свою первую привычку ♡</div>';
+
+ let dates=Object.keys(data.logs);
+
+ let all=dates.reduce((s,k)=>s+data.logs[k].length,0);
+
+ let active=dates.filter(k=>data.logs[k].length).length;
+
+ document.getElementById('statDays').textContent=active;
+
+ document.getElementById('statDone').textContent=all;
+
+ document.getElementById('statRate').textContent=dates.length&&data.habits.length?Math.round(all/(dates.length*data.habits.length)*100)+'%':'0%';
+
+ document.getElementById('streakList').innerHTML=data.habits.map(h=>`<div class="list-item">${escapeHTML(h.name)} <span style="float:right;color:var(--pink)">🔥 ${streak(h.id)}</span></div>`).join('');
+
+ let achievements=[];
+
+ if(all>=1)achievements.push('🌸 Первая привычка выполнена');
+
+ if(all>=10)achievements.push('✨ 10 выполнений');
+
+ if(all>=50)achievements.push('🏆 50 выполнений');
+
+ if(active>=7)achievements.push('💗 7 активных дней');
+
+ document.getElementById('achievements').innerHTML=achievements.join('<div class="list-item">')||'<p class="small">Твои достижения ещё впереди!</p>';
+
+ document.getElementById('goalList').innerHTML=data.goals.map((g,i)=>`<div class="card row"><span>${escapeHTML(g)}</span><button class="btn secondary" onclick="removeGoal(${i})">×</button></div>`).join('')||'<div class="empty">Добавь свою первую цель ♡</div>';
+
+ renderCalendar();
+
+ document.getElementById('journalText').value=data.journal[dateKey()]||'';
+
+ document.getElementById('journalDate').textContent=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+
+ document.getElementById('todayDate').textContent=new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+
+ document.getElementById('greeting').textContent=new Date().getHours()<12?'Доброе утро ☀️':new Date().getHours()<18?'Хорошего дня ♡':'Добрый вечер 🌙';
+
+}
+
+function removeHabit(id){
+
+ if(!confirm('Удалить привычку?'))return;
+
+ data.habits=data.habits.filter(h=>h.id!==id);save();render();
+
+}
+
+function addGoal(){
+
+ let v=document.getElementById('goalInput').value.trim();
+
+ if(!v)return;
+
+ data.goals.push(v);document.getElementById('goalInput').value='';
+
+ save();render();
+
+}
+
+function removeGoal(i){data.goals.splice(i,1);save();render()}
+
+function saveJournal(){
+
+ data.journal[dateKey()]=document.getElementById('journalText').value;
+
+ save();document.getElementById('savedMessage').textContent='Запись сохранена ♡';
+
+}
+
+function renderCalendar(){
+
+ let y=viewDate.getFullYear(),m=viewDate.getMonth();
+
+ document.getElementById('monthTitle').textContent=viewDate.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+
+ let first=new Date(y,m,1).getDay();
+
+ first=(first+6)%7;
+
+ let days=new Date(y,m+1,0).getDate();
+
+ let html=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="small">${x}</div>`).join('');
+
+ for(let i=0;i<first;i++)html+='<div class="day empty"></div>';
+
+ for(let d=1;d<=days;d++){
+
+  let k=new Date(y,m,d).toLocaleDateString('en-CA');
+
+  let isToday=k===dateKey(),marked=(data.logs[k]||[]).length>0;
+
+  html+=`<div class="day ${isToday?'today':''} ${marked?'marked':''}">${d}</div>`;
+
+ }
+
+ document.getElementById('calendarGrid').innerHTML=html;
+
+}
+
+function changeMonth(n){viewDate.setMonth(viewDate.getMonth()+n);renderCalendar()}
+
+function escapeHTML(s){
+
+ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+}
+
+function setReminder(){
+
+ let t=document.getElementById('reminderTime').value;
+
+ if(!t)return alert('Выбери время');
+
+ if(!('Notification' in window))return alert('Этот браузер не поддерживает уведомления.');
+
+ Notification.requestPermission().then(p=>{
+
+  if(p!=='granted'){alert('Разреши уведомления в настройках Safari.');return}
+
+  data.reminder=t;save();
+
+  document.getElementById('reminderStatus').textContent='Напоминание установлено на '+t+'. Пока страница открыта.';
+
+  scheduleReminder();
+
+ });
+
+}
+
+let reminderTimer;
+
+function scheduleReminder(){
+
+ clearTimeout(reminderTimer);
+
+ if(!data.reminder||Notification.permission!=='granted')return;
+
+ let [h,m]=data.reminder.split(':').map(Number),now=new Date(),next=new Date();
+
+ next.setHours(h,m,0,0);if(next<=now)next.setDate(next.getDate()+1);
+
+ reminderTimer=setTimeout(()=>{
+
+  new Notification('Self-development',{body:'Время уделить внимание своим привычкам ♡'});
+
+  scheduleReminder();
+
+ },next-now);
+
+}
+
+render();
+
+if(data.reminder){
+
+ document.getElementById('reminderTime').value=data.reminder;
+
+ if('Notification' in window && Notification.permission==='granted'){
+
+  document.getElementById('reminderStatus').textContent='Напоминание: '+data.reminder;
+
+  scheduleReminder();
+
+ }
+
+}
+
+</script>
+
+</body>
+
+</html>
